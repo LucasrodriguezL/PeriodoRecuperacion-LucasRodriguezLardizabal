@@ -1,7 +1,15 @@
 const express = require('express');
+const session = require('express-session');
 const mainRouter = require('./routes/main');
 
+
 const app = express();
+
+app.use(session({
+  secret: 'secreto', // Clave secreta para firmar la sesión, puedes cambiarla
+  resave: false,
+  saveUninitialized: true
+}));
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
