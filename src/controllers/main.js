@@ -1,5 +1,7 @@
 const bcryptjs = require('bcryptjs');
 const db = require('../database/models');
+const { Op } = require('sequelize');
+
 
 const mainController = {
   home: (req, res) => {
@@ -25,10 +27,28 @@ const mainController = {
   bookSearch: (req, res) => {
     res.render('search', { books: [] });
   },
-  bookSearchResult: (req, res) => {
-    // Implement search by title
-    res.render('search');
-  },
+  bookSearchResult: async (req, res) => {
+      try {
+        // Obtén el término de búsqueda del cuerpo de la solicitud
+        const searchTerm = req.body.title;
+    
+        // Realiza la búsqueda de libros en la base de datos
+        const books = await db.Book.findAll({
+          where: {
+            title: { [Op.like]: `%${searchTerm}%` } // Utiliza Sequelize para buscar títulos que contengan el término de búsqueda
+          },
+          include: [{ association: 'authors' }] // Incluye la asociación de autores en los resultados de la búsqueda
+        });
+    
+        // Renderiza la vista de resultados de búsqueda y pasa los libros encontrados como datos
+        res.render('search', { books }); // Cambia 'search' por 'search'
+      } catch (error) {
+        console.error('Error al buscar libros:', error);
+        res.status(500).send('Error interno del servidor');
+      }
+    },
+    
+  
   deleteBook: (req, res) => {
     // Implement delete book
     res.render('home');

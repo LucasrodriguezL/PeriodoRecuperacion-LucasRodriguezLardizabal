@@ -22,14 +22,34 @@
         </div>
       </form>
 
+      <div class="search-results">
+        <% if (books.length > 0) { %>
+          <h2>Resultados de la búsqueda:</h2>
+          <ul>
+            <% books.forEach((book) => { %>
+              <li>
+                <h3><%= book.title %></h3>
+                <img class="d-block mx-auto mb-4" src="<%= book.cover %>" alt="<%= book.title %>" width="172" height="257">
+                <div class="col-lg-6 mx-auto">
+                  <p class="lead mb-4 fw-bold">Authors:
+                    <% book.authors.forEach(author => { %>
+                      <%= author.name %><br>
+                    <% }); %>
+                  </p>
+                  <p class="lead mb-4 fw-bold">Release Date: <%= book.releaseDate %></p>
+                  <p class="lead mb-4"><%= book.description %></p>
+                <p class="lead mb-4"><%= book.description %></p>
+              </li>
+            <% }); %>
+          </ul>
+        <% } else { %>
+          <p>No se encontraron resultados para la búsqueda.</p>
+        <% } %>
+      </div>
 
-    <div class="list-group">
-      
     </div>
   </div>
-</div>
 
-
-<%- include('partials/footer.ejs') %>
+  <% include('partials/footer.ejs') %>
 </body>
 </html>

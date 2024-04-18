@@ -1,3 +1,5 @@
+const { DataTypes } = require("sequelize");
+
 module.exports = (sequelize, dataTypes) => {
   let alias = 'Book';
   let cols = {
@@ -16,7 +18,11 @@ module.exports = (sequelize, dataTypes) => {
     },
     description: {
       type: dataTypes.STRING
+    },
+    releaseDate: {
+      type: DataTypes.DATE 
     }
+
   };
   let config = {
     tableName: 'books',
