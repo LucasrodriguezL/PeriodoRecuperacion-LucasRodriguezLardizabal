@@ -22,7 +22,7 @@ module.exports = (sequelize, dataTypes) => {
 
   Author.associate = function (models) {
     Author.belongsToMany(models.Book, {
-      as: 'books',
+      as: 'Books',
       through: 'BooksAuthors',
       foreignKey: 'AuthorId',
       otherKey: 'BookId',

@@ -60,10 +60,20 @@ const mainController = {
       })
       .catch((error) => console.log(error));
   },
-  authorBooks: (req, res) => {
-    // Implement books by author
-    res.render('authorBooks');
+  authorBooks: async (req, res) => {
+    try {
+      const authorId = req.params.id;
+      const author = await db.Author.findByPk(authorId, { include: 'Books' }); // Incluye los libros del autor
+      if (!author) {
+        return res.status(404).send('Author not found');
+      }
+      res.render('authorBooks', { author });
+    } catch (error) {
+      console.log(error);
+      res.status(500).send('Internal Server Error');
+    }
   },
+  
   register: (req, res) => {
     res.render('register');
   },
