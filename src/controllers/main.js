@@ -5,11 +5,13 @@ const { Op } = require('sequelize');
 
 const mainController = {
   home: (req, res) => {
+    const user = req.session.user || null; // Verifica si hay un usuario en la sesión
+
     db.Book.findAll({
       include: [{ association: 'authors' }]
     })
       .then((books) => {
-        res.render('home', { books });
+        res.render('home', { books, user }); // Pasa la variable user al renderizar la vista
       })
       .catch((error) => console.log(error));
   },
@@ -20,7 +22,8 @@ const mainController = {
             if (!book) {
                 return res.status(404).send('Book not found');
             }
-            res.render('bookDetail', { book }); // Renderizar la vista con los datos del libro
+            const user = req.session.user || null;  // Obtener el usuario de la sesion
+            res.render('bookDetail', { book, user }); // Renderizar la vista con los datos del libro y el usuario
         })
         .catch((error) => console.log(error));
 },
@@ -96,22 +99,22 @@ const mainController = {
   processLogin: async (req, res) => {
     try {
       const { email, password } = req.body;
-
+  
       // Buscar al usuario por su correo electrónico en la base de datos
       const user = await db.User.findOne({ where: { Email: email } });
-
+  
       // Verificar si el usuario existe y la contraseña es válida
       if (!user || !bcryptjs.compareSync(password, user.Pass)) {
         return res.status(401).render('login', { error: 'Email or password is incorrect' });
       }
-
+  
       // Crear una sesión de usuario
       req.session.user = {
         id: user.id,
         email: user.Email,
         isAdmin: user.CategoryId === 1 // Si el CategoryId es 1, el usuario es administrador
       };
-
+  
       // Redirigir al usuario a la página de inicio
       res.redirect('/');
     } catch (error) {
@@ -119,6 +122,21 @@ const mainController = {
       res.status(500).send('Internal Server Error');
     }
   },
+
+  home: (req, res) => {
+    const user = req.session.user || null; // Verifica si hay un usuario en la sesión
+    
+    db.Book.findAll({
+      include: [{ association: 'authors' }]
+    })
+      .then((books) => {
+        res.render('home', { books, user }); // Pasa la variable user al renderizar la vista
+      })
+      .catch((error) => console.log(error));
+  },
+  
+
+
   logout: (req, res) => {
     // Destruir la sesión de usuario
     req.session.destroy((err) => {
