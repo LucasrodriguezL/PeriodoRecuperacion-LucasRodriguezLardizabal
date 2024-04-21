@@ -48,12 +48,39 @@ const mainController = {
       res.status(500).send('Error interno del servidor');
     }
   },
-  deleteBook: (req, res) => {
-    const bookId = req.params.id;
-    // Aquí iría la lógica para eliminar el libro con el id bookId
-    // Después de eliminar el libro, redirige al usuario a la página de inicio
-    res.redirect('/');
+  deleteBook: async (req, res) => {
+    try {
+      const bookId = req.params.id;
+      // Buscar el libro por su ID
+      const book = await db.Book.findByPk(bookId);
+      if (!book) {
+        return res.status(404).send('Libro no encontrado');
+      }
+      // Verificar si el usuario actual es un administrador
+      if (!req.session.user || !req.session.user.isAdmin) {
+        return res.status(403).send('No tienes permiso para realizar esta acción');
+      }
+  
+      // Eliminar las relaciones del libro en la tabla BooksAuthors
+      await db.sequelize.query('DELETE FROM BooksAuthors WHERE BookId = :bookId', {
+        replacements: { bookId: req.params.id }
+      });
+      
+  
+      // Eliminar el libro de la base de datos
+      await book.destroy({
+        where: {
+            id: req.params.id
+        }
+    });
+  
+      res.redirect('/'); // Redirigir a la página principal u otra página deseada después de eliminar el libro
+    } catch (error) {
+      console.log(error);
+      res.status(500).send('Error interno del servidor');
+    }
   },
+  
   authors: (req, res) => {
     db.Author.findAll()
       .then((authors) => {
