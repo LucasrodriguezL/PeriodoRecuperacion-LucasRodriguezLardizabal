@@ -8,7 +8,12 @@ const app = express();
 app.use(session({
   secret: 'secreto', // Clave secreta para firmar la sesión, puedes cambiarla
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  cookie: {
+    secure: false, 
+    maxAge: 1000 * 60 * 60 * 24, // Duración de la cookie en milisegundos (aquí es de un día)
+    httpOnly: true
+  }
 }));
 
 app.use(express.urlencoded({ extended: false }));
